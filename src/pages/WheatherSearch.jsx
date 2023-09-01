@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { snapshot, useSnapshot } from "valtio";
+import { useSnapshot } from "valtio";
 import { CiSearch } from "react-icons/ci";
 
 import state from "../store";

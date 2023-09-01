@@ -7,6 +7,8 @@ import { useSnapshot } from "valtio";
 
 import state from "../store";
 
+import Globe from "../assets/globe.gif";
+
 import {
   headContainerAnimation,
   headContentAnimation,
@@ -21,11 +23,7 @@ const Home = () => {
       {snap.intro && (
         <motion.section className='home' {...slideAnimation("left")}>
           <motion.header {...slideAnimation("down")}>
-            <img
-              src='./world.png'
-              alt='logo'
-              className='w-8 h-8 object-contain'
-            />
+            <img src={Globe} alt='logo' className='w-8 h-8 object-contain' />
           </motion.header>
           <motion.div className='home-content' {...headContainerAnimation}>
             <motion.div {...headTextAnimation}>

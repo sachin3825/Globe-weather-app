@@ -7,8 +7,8 @@ function App() {
   return (
     <main className='app transition-all ease-in bg-gradient-to-b from-indigo-900 via-indigo-800 to-indigo-600'>
       <Home />
-      <CanvasModel />
       <WheatherSearch />
+      <CanvasModel />
     </main>
   );
 }
