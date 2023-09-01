@@ -21,34 +21,55 @@ const WeatherSearch = () => {
 
   const [cityData, setCityData] = useState(null);
   const [weatherImage, setWeatherImage] = useState(cloud);
+  const [error, setError] = useState(null);
 
   const search = async () => {
+    setError(null);
     const element = document.querySelector(".cityInput");
     const cityName = element.value;
+    if (!cityName) {
+      setError("Please enter a city name.");
+      return;
+    }
 
-    if (cityName === "") {
-      // If nothing is searched, show current location data
-      navigator.geolocation.getCurrentPosition(async (position) => {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${api_key}`;
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setCityData(data);
+        setError(null); // Clear any previous error
+      } else {
+        setError("City not found. Please enter a valid city name.");
+      }
+    } catch (error) {
+      setError("Error fetching data. Please try again later.");
+    }
+  };
+
+  const grantAccess = () => {
+    // Request location permission
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
         const { latitude, longitude } = position.coords;
         const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${api_key}`;
         try {
           const response = await fetch(url);
-          const data = await response.json();
-          setCityData(data);
+          if (response.ok) {
+            const data = await response.json();
+            setCityData(data);
+            setError(null);
+          } else {
+            setError("Location not found. Please try again later.");
+          }
         } catch (error) {
-          console.error("Error fetching data: ", error);
+          setError("Error fetching data. Please try again later.");
         }
-      });
-    } else {
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${api_key}`;
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        setCityData(data);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
+      },
+      () => {
+        setError("Location access denied or unavailable.");
       }
-    }
+    );
   };
 
   const handleKeyPress = (event) => {
@@ -97,9 +118,15 @@ const WeatherSearch = () => {
           >
             <CustomButton
               type='filled'
+              title={"Grant access"}
+              handleClick={() => grantAccess()}
+              customStyle={"w-fit px-4 py-2.5 font-bold text-sm"}
+            />
+            <CustomButton
+              type='filled'
               title={"Go Back"}
               handleClick={() => (state.intro = true)}
-              customStyle={"w-fit px-4 py-2.5 font-bold text-sm"}
+              customStyle={"w-fit px-4 py-2.5 font-bold text-sm ml-5"}
             />
           </motion.div>
           <div className='container w-full'>
@@ -109,7 +136,7 @@ const WeatherSearch = () => {
                   type='text'
                   placeholder='Search'
                   className='cityInput w-2/6 h-10 bg-white border-none outline-none rounded-full pl-10 text-xl focus:border-black focus:border-spacing-2 transition-all duration-200 focus:outline'
-                  onKeyPress={handleKeyPress}
+                  onKeyDownCapture={handleKeyPress}
                 />
                 <div
                   onClick={search}
@@ -117,6 +144,7 @@ const WeatherSearch = () => {
                 >
                   <CiSearch />
                 </div>
+                <div className='error-message text-red-500'>{error}</div>
               </div>
             </motion.div>
           </div>
